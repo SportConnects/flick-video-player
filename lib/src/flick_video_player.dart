@@ -174,9 +174,11 @@ class _FlickVideoPlayerState extends State<FlickVideoPlayer> {
 
   _setSystemUIOverlays() {
     if (_isFullscreen) {
-      SystemChrome.setEnabledSystemUIOverlays(widget.systemUIOverlayFullscreen);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+          overlays: widget.systemUIOverlayFullscreen);
     } else {
-      SystemChrome.setEnabledSystemUIOverlays(widget.systemUIOverlay);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+          overlays: widget.systemUIOverlay);
     }
   }
 
@@ -198,13 +200,12 @@ class _FlickVideoPlayerState extends State<FlickVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () {
-        if (_overlayEntry != null) {
-          flickManager.flickControlManager!.exitFullscreen();
-          return Future.value(false);
-        }
-        return Future.value(true);
-      },
+      onWillPop: _overlayEntry != null
+          ? () {
+              flickManager.flickControlManager!.exitFullscreen();
+              return Future.value(false);
+            }
+          : null,
       child: FlickManagerBuilder(
         flickManager: flickManager,
         child: widget.flickVideoWithControls,
